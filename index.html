@@ -1,0 +1,60 @@
+<html>
+	<head>		
+		<title>jsrender Playlist Players</title>
+		
+		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/jsviews/0.9.90/jquery.observable.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/jsviews/0.9.90/jsviews.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/jsviews/0.9.90/jsrender.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/jsviews/0.9.90/jquery.views.js"></script>
+		<script src="//apis.google.com/js/client.js?onload=load"></script>
+		<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+		<script type="text/javascript" src="js/YouTubePlaylist.js"></script>
+		<script type="text/javascript" src="js/gapiPlayerScripts.js"></script>
+		
+		<link rel="stylesheet" type="text/css" href="css/playList.css" />
+
+		<script type="text/x-jsrender" id="playListPlayerTemplate">
+			<div id="{{:id}}playListPlayer" class="playListPlayer">
+				<div class="playListPlayerObject">
+					<div id="player"></div>
+				</div>
+				<div style="display:inline-block; vertical-align: top;">
+					<div class="playListEntries">
+						{{for entries ~player_id=id}}
+							<div class="playListEntry {{if #index == 0}} nowPlaying {{/if}}" id="{{:video_id}}">
+							   <div onclick="cueThisVideo('{{:~player_id}}', '{{:video_id}}');" class="playListEntryThumbnail"><img src="{{:image_src}}"></div>
+							   <div class="playListEntryDescription">
+								  <div onclick="cueThisVideo('{{:~player_id}}', '{{:video_id}}');" class="playListEntryTitle">{{:title}}</div>
+								  <div class="playListEntryNote">{{:note}}</div>
+							   </div>
+							</div>
+						{{/for}}
+					</div>
+					<div class="playListControls">
+						<i class="playListControl disabled fas fa-fast-backward" onclick="if(!$(this).hasClass('disabled')) {	loadPreviousVideo('{{:id}}')	}"></i>
+						<i class="playListControl fas fa-fast-forward" onclick="if(!$(this).hasClass('disabled')) {	loadNextVideo('{{:id}}')	}"></i>
+						<i class="playListControl fas fa-random" onclick="if(window['{{:id}}'].randomize()) {	$(this).addClass('randomizeActive');	} else {	$(this).removeClass('randomizeActive');	}arrangePlayerControls('{{:id}}');"></i>
+					</div>
+				</div>
+			</div>
+		</script>			
+	</head>	
+	<body style="background: none repeat scroll 0 0 #EEEEEE;">
+		<div id="playList1" style="margin-bottom: 10px">
+		</div>
+		<div id="playList2" style="margin-bottom: 10px">
+		</div>
+		<script type="text/javascript">
+			function callbackfunction() {
+	                	gapi.client.setApiKey('AIzaSyBYuOaNuq4vD2jbktJb5srKpBRayGUFRyk');
+        	        	gapi.client.load('youtube', 'v3', function() {
+					addPlaylistToElement("PLLzJfby7cTLSN_0Pf7_FlgWHGngo81ELi", "playList1");
+				});
+
+			}
+		</script>
+		<script src="https://apis.google.com/js/client.js?onload=callbackfunction"></script>
+	</body>
+</html>
+
