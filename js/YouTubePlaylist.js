@@ -6,6 +6,9 @@ function YouTubePlayList(id, entries) {
 }
 
 YouTubePlayList.prototype = {
+	getId: function() {
+		return this.id;
+	},
 	next: function() {
 		var retVal = false;
 		if(this.randomizer) {
