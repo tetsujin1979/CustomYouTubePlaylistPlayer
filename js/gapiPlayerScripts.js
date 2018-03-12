@@ -1,4 +1,5 @@
 var player;
+var customPlayer;
 var firstVideo;
 
 function addPlaylistToElement(playlist_id, element_id) {	
@@ -22,16 +23,16 @@ function addPlaylistToElement(playlist_id, element_id) {
 				var time = value.split(":");
 				var seconds = parseInt(time[0]) * 60;
 				seconds += parseInt(time[1]);
-				note = note.replace(value, "<span class='timeLink' onclick='cueThisVideo(\"" + player_id + "\", \"" + video_id + "\", " + seconds + ");'>" + value + "</span>");
+				note = note.replace(value, "<span class='timeLink' onclick='cueThisVideo(\"" + video_id + "\", " + seconds + ");'>" + value + "</span>");
 			});
 			entry.note = note;
 			entries.push(entry);
 		});
-		window[player_id] = new YouTubePlayList(player_id, entries);
+		customPlayer = new YouTubePlayList(player_id, entries);
 		var playListPlayer = $.templates("#playListPlayerTemplate");
-		$('#' + element_id).html($('#playListPlayerTemplate').render(window[player_id]));
+		$('#' + element_id).html($('#playListPlayerTemplate').render(customPlayer));
 		
-		firstVideo = window[player_id].getEntry(0).video_id;
+		firstVideo = customPlayer.getEntry(0).video_id;
 		var youtubePlayerApi = document.createElement('script');
 		youtubePlayerApi.src = "https://www.youtube.com/iframe_api";
 		var firstScriptTag = document.getElementsByTagName('script')[0];
@@ -44,58 +45,74 @@ function onYouTubeIframeAPIReady() {
 		videoId: firstVideo,
 		playerVars: {
 			controls: 1
+		},
+		events: {
+			'onStateChange': onPlayerStateChange
 		}
 	});
 }
 
-function cueThisVideo(player_id, video_id, time)	{
-	time = time || 0;
-	var currently_playing_video_id = window[player_id].getCurrentlyPlaying();
-	window[player_id].setCurrentlyPlaying(video_id);
-	loadVideoForPlayer(currently_playing_video_id, player_id, time);
-}
-
-function loadNextVideo(player_id) {	
-	var currently_playing_video_id = window[player_id].getCurrentlyPlaying();
-	if(window[player_id].next()) {
-		loadVideoForPlayer(currently_playing_video_id, player_id);
+function onPlayerStateChange(event) {
+	if (event.data == YT.PlayerState.ENDED) {
+		loadNextVideo();
 	}
 }
 
-function loadVideoForPlayer(currently_playing_video_id, player_id, time) {
+function cueThisVideo(video_id, time)	{
 	time = time || 0;
-	var video_id = window[player_id].getCurrentlyPlaying();
-	$('#' + currently_playing_video_id).removeClass('nowPlaying')
-	$('#' + video_id).addClass('nowPlaying');
-	$('#' + player_id + 'playListEntries').scrollTop($('#' + video_id).index() * 80);
-	player.loadVideoById(video_id, time, "large");
-	arrangePlayerControls(player_id);
+	var currently_playing_video_id = customPlayer.getCurrentlyPlaying();
+	customPlayer.setCurrentlyPlaying(video_id);
+	loadVideoForPlayer(currently_playing_video_id, time);
 }
 
-function arrangePlayerControls(player_id) {
-	var playListPlayer = $('#' + player_id + 'playListPlayer');
+function loadNextVideo() {	
+	var currently_playing_video_id = customPlayer.getCurrentlyPlaying();
+	if(customPlayer.next()) {
+		loadVideoForPlayer(currently_playing_video_id);
+	}
+}
+
+function loadPreviousVideo() {	
+	var currently_playing_video_id = customPlayer.getCurrentlyPlaying();
+	if(customPlayer.previous()) {
+		loadVideoForPlayer(currently_playing_video_id);
+	}
+}
+
+function loadVideoForPlayer(currently_playing_video_id, time) {
+	time = time || 0;
+	var video_id = customPlayer.getCurrentlyPlaying();
+	$('#' + currently_playing_video_id).removeClass('nowPlaying')
+	$('#' + video_id).addClass('nowPlaying');
+	$('#' + customPlayer.getId() + 'playListEntries').scrollTop($('#' + video_id).index() * 80);
+	player.loadVideoById(video_id, time, "large");
+	arrangePlayerControls();
+}
+
+function arrangePlayerControls() {
+	var playListPlayer = $('#' + customPlayer.getId() + 'playListPlayer');
 	//If the player is on random, the "previous" button is always disabled, the "next" button is always enabled
-	if(window[player_id].isRandomized()) {
-		$('#' + player_id + 'Backward').addClass('disabled');
-		$('#' + player_id + 'Forward').removeClass('disabled');
-		$('#' + player_id + 'Random').addClass('randomizeActive');
+	if(customPlayer.isRandomized()) {
+		$('#' + customPlayer.getId() + 'Backward').addClass('disabled');
+		$('#' + customPlayer.getId() + 'Forward').removeClass('disabled');
+		$('#' + customPlayer.getId() + 'Random').addClass('randomizeActive');
 	}
 	//Otherwise, if the first element is selected, disable the "previous" button
 	//if the last element is selected, disable the "next" button
 	else {
-		$('#' + player_id + 'Random').removeClass('randomizeActive');
-		var playListEntries = $('#' + player_id + 'playListEntries');
+		$('#' + customPlayer.getId() + 'Random').removeClass('randomizeActive');
+		var playListEntries = $('#playListEntries');
 		if(playListEntries.children(":first").hasClass('nowPlaying')) {
-			$('#' + player_id + 'Backward').addClass('disabled');
+			$('#' + customPlayer.getId() + 'Backward').addClass('disabled');
 		}
 		else {
-			$('#' + player_id + 'Backward').removeClass('disabled');
+			$('#' + customPlayer.getId() + 'Backward').removeClass('disabled');
 		}
 		if(playListEntries.children(":last").hasClass('nowPlaying')) {
-			$('#' + player_id + 'Forward').addClass('disabled');
+			$('#' + customPlayer.getId() + 'Forward').addClass('disabled');
 		}
 		else {
-			$('#' + player_id + 'Forward').removeClass('disabled');
+			$('#' + customPlayer.getId() + 'Forward').removeClass('disabled');
 		}
 	}
 }
