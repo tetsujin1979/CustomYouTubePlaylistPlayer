@@ -20,21 +20,21 @@
 					<div id="player"></div>
 				</div>
 				<div style="display:inline-block; vertical-align: top;">
-					<div class="playListEntries">
+					<div id="playListEntries" class="playListEntries">
 						{{for entries ~player_id=id}}
 							<div class="playListEntry {{if #index == 0}} nowPlaying {{/if}}" id="{{:video_id}}">
-							   <div onclick="cueThisVideo('{{:~player_id}}', '{{:video_id}}');" class="playListEntryThumbnail"><img src="{{:image_src}}"></div>
+							   <div onclick="cueThisVideo('{{:video_id}}');" class="playListEntryThumbnail"><img src="{{:image_src}}"></div>
 							   <div class="playListEntryDescription">
-								  <div onclick="cueThisVideo('{{:~player_id}}', '{{:video_id}}');" class="playListEntryTitle">{{:title}}</div>
+								  <div onclick="cueThisVideo('{{:video_id}}');" class="playListEntryTitle">{{:title}}</div>
 								  <div class="playListEntryNote">{{:note}}</div>
 							   </div>
 							</div>
 						{{/for}}
 					</div>
 					<div class="playListControls">
-						<i class="playListControl disabled fas fa-fast-backward" onclick="if(!$(this).hasClass('disabled')) {	loadPreviousVideo('{{:id}}')	}"></i>
-						<i class="playListControl fas fa-fast-forward" onclick="if(!$(this).hasClass('disabled')) {	loadNextVideo('{{:id}}')	}"></i>
-						<i class="playListControl fas fa-random" onclick="if(window['{{:id}}'].randomize()) {	$(this).addClass('randomizeActive');	} else {	$(this).removeClass('randomizeActive');	}arrangePlayerControls('{{:id}}');"></i>
+						<i id="{{:id}}Backward" class="playListControl disabled fas fa-fast-backward" onclick="if(!$(this).hasClass('disabled')) {	loadPreviousVideo('{{:id}}')	}"></i>
+						<i id="{{:id}}Forward" class="playListControl fas fa-fast-forward" onclick="if(!$(this).hasClass('disabled')) {	loadNextVideo('{{:id}}')	}"></i>
+						<i id="{{:id}}Random" class="playListControl fas fa-random" onclick="if(window['{{:id}}'].randomize()) {	$(this).addClass('randomizeActive');	} else {	$(this).removeClass('randomizeActive');	}arrangePlayerControls('{{:id}}');"></i>
 					</div>
 				</div>
 			</div>
